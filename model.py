@@ -13,17 +13,45 @@ class GNNClassifier(nn.Module):
             nn.ReLU(),
             nn.Linear(32, 1)
         )
-        # TODO: consider adding dropout layers to prevent overfitting
+        # Optional: consider adding dropout layers to prevent overfitting
 
     def forward(self, data):
         x, edge_index, batch = data.x, data.edge_index, data.batch
         x = self.conv1(x, edge_index)
         x = F.relu(x)
         x = self.conv2(x, edge_index)
-        # NOTE: global_mean_pool might not capture complex subgraph interactions
         x = global_mean_pool(x, batch)
         return torch.sigmoid(self.classifier(x))
-        # FIXME: maybe add option to return logits instead of sigmoid for flexible loss functions
+        # Optionally return logits instead of sigmoid if needed
 
-# REVIEW: test model with batch size >1 to ensure batch pooling works correctly
-# TODO: add unit test for GNN forward pass with dummy graph data
+def classify_risk(prob_tensor, low_thresh=0.45, high_thresh=0.55):
+    """
+    Convert sigmoid output probabilities into LOW / MEDIUM / HIGH risk.
+
+    Args:
+        prob_tensor: torch.Tensor of shape (batch_size, 1)
+        low_thresh: float, below which risk is LOW
+        high_thresh: float, above which risk is HIGH
+
+    Returns:
+        List of strings: ["LOW", "MEDIUM", "HIGH"] for each example
+    """
+    categories = []
+    probs = prob_tensor.detach().cpu()
+    for p in probs:
+        # If output is a tensor with shape (1,), get scalar value
+        p_val = p.item() if isinstance(p, torch.Tensor) else float(p)
+        if p_val < low_thresh:
+            categories.append("LOW")
+        elif p_val > high_thresh:
+            categories.append("HIGH")
+        else:
+            categories.append("MEDIUM")
+    return categories
+
+# Example test (can remove in final version)
+if __name__ == "__main__":
+    # Dummy test
+    dummy_output = torch.tensor([[0.2], [0.5], [0.7]])
+    print("Risk categories:", classify_risk(dummy_output))
+    # Expected: ['LOW', 'MEDIUM', 'HIGH']
