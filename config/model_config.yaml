@@ -1,0 +1,9 @@
+# GNN model configuration
+
+hidden_dim: 64         # Number of hidden units in GCN layers
+dropout_rate: 0.2      # Dropout rate to prevent overfitting
+num_classes: 1         # Output classes (1 for binary risk probability)
+
+# Risk classification thresholds
+low_threshold: 0.45
+high_threshold: 0.55
