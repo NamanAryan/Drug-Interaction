@@ -105,8 +105,8 @@ if __name__ == "__main__":
     data_list = []
     for i in range(3):
         num_nodes = 4
-        x = torch.rand((num_nodes,1))
-        edge_index = torch.tensor([[0,1,2],[1,2,3]], dtype=torch.long)
+        x = torch.rand((num_nodes, 1))
+        edge_index = torch.tensor([[0, 1, 2], [1, 2, 3]], dtype=torch.long)
         data_list.append(Data(x=x, edge_index=edge_index))
     model = GNNClassifier()
     probs, risks = batch_classify(model, data_list)
