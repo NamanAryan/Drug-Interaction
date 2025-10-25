@@ -1,3 +1,6 @@
+hidden_dim: 64
+dropout_rate: 0.2
+num_classes: 1
 # GNN model configuration
 
 hidden_dim: 64         # Number of hidden units in GCN layers
